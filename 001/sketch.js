@@ -6,6 +6,87 @@ const ball = {
   speedY: 3
 }
 
+//PATH SAMO PAMTI
+const snake = {
+  x: 50,
+  y: 50,
+  size: 10,
+  body: 3,
+  speed: 10,
+  display: function () {
+    noStroke();
+    fill(255);
+    square(this.x, this.y, this.size)
+  },
+  path: {
+    x: this.x - 10,
+    y: this.y - 10
+  },
+  moveRight: function () {
+    this.path.x = this.x;
+    this.path.y = this.y;
+    this.x = this.x + this.speed;
+  },
+  moveLeft: function () {
+    this.path.x = this.x;
+    this.path.y = this.y;
+    this.x = this.x - this.speed;
+  },
+  moveUp: function () {
+    this.path.x = this.x;
+    this.path.y = this.y;
+    this.y = this.y - this.speed;
+  },
+  moveDown: function () {
+    this.path.x = this.x;
+    this.path.y = this.y;
+    this.y = this.y + this.speed;
+  },
+}
+const tail1 = {
+  path: {
+    x: 0,
+    y: 0
+  },
+  createPath: function () {
+    this.x = snake.path.x;
+    this.y = snake.path.y;
+  },
+  assignPath: function () {
+    this.path.x = snake.path.x;
+    this.path.y = snake.path.y;
+  },
+  display: function () {
+    noStroke();
+    fill(255);
+    square(this.x, this.y, 10);
+  },
+  // follow: function () {
+  //   tail1.x = snake.path.x;
+  //   tail1.y = snake.path.y;
+  // },
+}
+
+const tail2 = {
+  createPath: function () {
+    this.x = tail1.path.x;
+    this.y = tail1.path.y;
+  },
+  display: function () {
+    noStroke();
+    fill(255);
+    square(this.x, this.y, 10)
+    // print(tail1.path.x)
+  }
+}
+
+// console.log(snake.tail.x)
+// const tailPath = {
+//   x: 0,
+//   y: 0,
+// }
+
+
 const player = {
   x: 0,
   y: 800 - 20,
@@ -40,16 +121,63 @@ function setup() {
     squares[i] = new Square((i + 1) * 100, 100);
   }
 
-  print(squares)
+  // setInterval(snake.moveRight(), 500);
+
 }
 
+//snake movement
+
+function keyPressed() {
+  if (keyCode === RIGHT_ARROW) {
+    // tail.path.x = snake.x;
+    // tail.path.y = snake.y;
+    snake.moveRight();
+  }
+  if (keyCode === LEFT_ARROW) {
+    snake.moveLeft();
+  }
+  if (keyCode === UP_ARROW) {
+    snake.moveUp();
+  }
+  if (keyCode === DOWN_ARROW) {
+    snake.moveDown();
+  }
+}
+
+// if (keyIsDown(RIGHT_ARROW)) {
+//   snake.moveRight();
+// }
+
 function draw() {
-  let xOffset = 0;
   //BALL creation
   background(0);
   noStroke();
   fill(255);
   circle(ball.x, ball.y, ball.radius);
+
+  //snake creation
+  snake.display();
+  tail1.display();
+  tail1.createPath();
+  tail1.assignPath();
+  tail2.createPath();
+  tail2.display();
+  // tail.follow();
+  // SNAKE MOVEMENT
+  // if (keyIsDown(RIGHT_ARROW)) {
+  //   snake.moveRight();
+  // }
+  // if (keyIsDown(LEFT_ARROW)) {
+  //   snake.moveLeft();
+  // }
+  // if (keyIsDown(UP_ARROW)) {
+  //   snake.moveUp();
+  // }
+  // if (keyIsDown(DOWN_ARROW)) {
+  //   snake.moveDown();
+  // }
+
+  // setInterval(keyPressed(), 500);
 
 
   // ubaci kocke
