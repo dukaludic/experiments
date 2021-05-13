@@ -6,8 +6,34 @@ const ball = {
   speedY: 3
 }
 
-//PATH SAMO PAMTI
-const snake = {
+snakeBody = [];
+
+function AddSnake(x, y, tmpX, tmpY) { // x = 40 y = 50
+  this.x = x;
+  this.y = y;
+  this.tmpX = tmpX;
+  this.tmpY = tmpY;
+  this.display = function () {
+    noStroke();
+    fill(255);
+    square(this.x, this.y, 10);
+  }
+}
+
+const snakeFood = []
+
+function Food(x, y) {
+  this.x = x;
+  this.y = y;
+  this.display = function () {
+    noStroke();
+    fill(255);
+    square(this.x, this.y, 10)
+  }
+}
+
+//PATH = Temporary variable
+snakeBody[0] = {
   x: 50,
   y: 50,
   size: 10,
@@ -18,73 +44,21 @@ const snake = {
     fill(255);
     square(this.x, this.y, this.size)
   },
-  path: {
-    x: this.x - 10,
-    y: this.y - 10
-  },
+  tmpX: this.x - 10,
+  tmpY: this.y - 10,
   moveRight: function () {
-    this.path.x = this.x;
-    this.path.y = this.y;
     this.x = this.x + this.speed;
   },
   moveLeft: function () {
-    this.path.x = this.x;
-    this.path.y = this.y;
     this.x = this.x - this.speed;
   },
   moveUp: function () {
-    this.path.x = this.x;
-    this.path.y = this.y;
     this.y = this.y - this.speed;
   },
   moveDown: function () {
-    this.path.x = this.x;
-    this.path.y = this.y;
     this.y = this.y + this.speed;
   },
 }
-const tail1 = {
-  path: {
-    x: 0,
-    y: 0
-  },
-  createPath: function () {
-    this.x = snake.path.x;
-    this.y = snake.path.y;
-  },
-  assignPath: function () {
-    this.path.x = snake.path.x;
-    this.path.y = snake.path.y;
-  },
-  display: function () {
-    noStroke();
-    fill(255);
-    square(this.x, this.y, 10);
-  },
-  // follow: function () {
-  //   tail1.x = snake.path.x;
-  //   tail1.y = snake.path.y;
-  // },
-}
-
-const tail2 = {
-  createPath: function () {
-    this.x = tail1.path.x;
-    this.y = tail1.path.y;
-  },
-  display: function () {
-    noStroke();
-    fill(255);
-    square(this.x, this.y, 10)
-    // print(tail1.path.x)
-  }
-}
-
-// console.log(snake.tail.x)
-// const tailPath = {
-//   x: 0,
-//   y: 0,
-// }
 
 
 const player = {
@@ -114,39 +88,82 @@ function setup() {
   noStroke();
   fill(255);
   circle(200, 200, 255);
-  // square1.create(100, 100);
 
   //UBACUJE square[i] u array squarova
   for (let i = 0; i < 4; i++) {
     squares[i] = new Square((i + 1) * 100, 100);
   }
 
-  // setInterval(snake.moveRight(), 500);
+  //ADD SNAKE
+  let startCoordinateX = 40;
+  let startCoordinateY = 50;
+  let tmpX = 40;
+  let tmpY = 50;
+  for (let i = 1; i <= 7; i++) {
+    snakeBody[i] = new AddSnake(startCoordinateX, startCoordinateY, tmpX, tmpY);
+    tmpX = tmpX - 10;
+    startCoordinateX = startCoordinateX - 10;
+  }
 
+  //ADD SNAKEFOOD
+  for (let i = 0; i < 5; i++) {
+    snakeFood[i] = new Food(random(width), random(height));
+  }
 }
 
-//snake movement
+
+
+// for (let i = snakeBody.length - 1; i >= 0; i--) { //snakeBody.length - 1 = 4
+//   if (i == 1) {
+//     snakeBody[i].tmpX = snakeBody[i - 1].x;
+//     snakeBody[i].tmpY = snakeBody[i - 1].y;
+//     snakeBody[i].x = snakeBody[i - 1].x;
+//     snakeBody[i].y = snakeBody[i - 1].y;
+//   }
+//   snakeBody[i].tmpX = snakeBody[i - 1].x;
+//   snakeBody[i].tmpY = snakeBody[i - 1].y;
+//   snakeBody[i].x = snakeBody[i - 1].tmpX;
+//   snakeBody[i].y = snakeBody[i - 1].tmpY;
+// }
 
 function keyPressed() {
+  for (let i = snakeBody.length - 1; i > 0; i--) { //snakeBody.length - 1 = 4
+    if (i === 1) {
+      snakeBody[i].tmpX = snakeBody[i - 1].x;
+      snakeBody[i].tmpY = snakeBody[i - 1].y;
+      snakeBody[i].x = snakeBody[i - 1].x;
+      snakeBody[i].y = snakeBody[i - 1].y;
+    } else {
+      snakeBody[i].tmpX = snakeBody[i - 1].x;
+      snakeBody[i].tmpY = snakeBody[i - 1].y;
+      snakeBody[i].x = snakeBody[i - 1].tmpX;
+      snakeBody[i].y = snakeBody[i - 1].tmpY;
+    }
+  }
+
+  // for (let i = 0; i < 5; i++) {
+  //   console.log(`TMP X ${i}: ${snakeBody[i].tmpX}!`)
+  //   console.log(`TMP Y ${i}: ${snakeBody[i].tmpY}`)
+  // }
+
+  // for (let i = 0; i < 5; i++) {
+  //   console.log(`X ${i}: ${snakeBody[i].x}`)
+  //   console.log(`Y ${i}: ${snakeBody[i].y}`)
+  // }
+
   if (keyCode === RIGHT_ARROW) {
-    // tail.path.x = snake.x;
-    // tail.path.y = snake.y;
-    snake.moveRight();
+    snakeBody[0].moveRight();
   }
   if (keyCode === LEFT_ARROW) {
-    snake.moveLeft();
+    snakeBody[0].moveLeft();
   }
   if (keyCode === UP_ARROW) {
-    snake.moveUp();
+    snakeBody[0].moveUp();
   }
   if (keyCode === DOWN_ARROW) {
-    snake.moveDown();
+    snakeBody[0].moveDown();
   }
 }
-
-// if (keyIsDown(RIGHT_ARROW)) {
-//   snake.moveRight();
-// }
 
 function draw() {
   //BALL creation
@@ -154,45 +171,23 @@ function draw() {
   noStroke();
   fill(255);
   circle(ball.x, ball.y, ball.radius);
-
   //snake creation
-  snake.display();
-  tail1.display();
-  tail1.createPath();
-  tail1.assignPath();
-  tail2.createPath();
-  tail2.display();
-  // tail.follow();
-  // SNAKE MOVEMENT
-  // if (keyIsDown(RIGHT_ARROW)) {
-  //   snake.moveRight();
-  // }
-  // if (keyIsDown(LEFT_ARROW)) {
-  //   snake.moveLeft();
-  // }
-  // if (keyIsDown(UP_ARROW)) {
-  //   snake.moveUp();
-  // }
-  // if (keyIsDown(DOWN_ARROW)) {
-  //   snake.moveDown();
-  // }
 
-  // setInterval(keyPressed(), 500);
-
+  for (let i = 0; i < snakeBody.length; i++) {
+    snakeBody[i].display();
+  }
 
   // ubaci kocke
-  // for (let i = 0; i < squares.length; i++) {
-  //   if (squares[i].exists) {
-  //     squares[i].create(squares[i].x, squares[i].y)
-  //     // print(squares[0].exists)
-  //   }
-  //   // xOffset += 100;
-  // }
 
   for (let i = 0; i < 4; i++) {
     if (squares[i].exists) {
       squares[i].display();
     }
+  }
+
+  //ubacihranu
+  for (let i = 0; i < snakeFood.length; i++) {
+    snakeFood[i].display();
   }
 
   // print(squares)
@@ -278,7 +273,7 @@ function draw() {
       if (ball.y > squares[i].y && ball.y < squares[i].y + squares[i].size && ball.x > squares[i].x && ball.x < squares[i].x + squares[i].size) {
         ball.speedY = -ball.speedY;
         squares[i].exists = false;
-        print(squares[i].exists);
+        // print(squares[i].exists);
       }
     }
   }
