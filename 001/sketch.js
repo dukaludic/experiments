@@ -6,7 +6,7 @@ const ball = {
   speedY: 3
 }
 
-snakeBody = [];
+const snakeBody = [];
 
 function AddSnake(x, y, tmpX, tmpY) { // x = 40 y = 50
   this.x = x;
@@ -22,13 +22,15 @@ function AddSnake(x, y, tmpX, tmpY) { // x = 40 y = 50
 
 const snakeFood = []
 
-function Food(x, y) {
+function Food(x, y, size) {
   this.x = x;
   this.y = y;
+  this.size = size;
+  this.exists = true;
   this.display = function () {
     noStroke();
-    fill(255);
-    square(this.x, this.y, 10)
+    fill(0, 100, 0);
+    square(this.x, this.y, size)
   }
 }
 
@@ -82,6 +84,17 @@ function Square(x, y) {
   }
 }
 
+let snakeSize = 3;
+let startCoordinateX = 40;
+let startCoordinateY = 50;
+let tmpX = 40;
+let tmpY = 50;
+for (let i = 1; i <= snakeSize; i++) {
+  snakeBody[i] = new AddSnake(startCoordinateX, startCoordinateY, tmpX, tmpY);
+  tmpX = tmpX - 10;
+  startCoordinateX = startCoordinateX - 10;
+}
+
 function setup() {
   createCanvas(500, 800);
   background(0);
@@ -95,36 +108,15 @@ function setup() {
   }
 
   //ADD SNAKE
-  let startCoordinateX = 40;
-  let startCoordinateY = 50;
-  let tmpX = 40;
-  let tmpY = 50;
-  for (let i = 1; i <= 7; i++) {
-    snakeBody[i] = new AddSnake(startCoordinateX, startCoordinateY, tmpX, tmpY);
-    tmpX = tmpX - 10;
-    startCoordinateX = startCoordinateX - 10;
-  }
+
 
   //ADD SNAKEFOOD
-  for (let i = 0; i < 5; i++) {
-    snakeFood[i] = new Food(random(width), random(height));
+  for (let i = 0; i < 15; i++) {
+    snakeFood[i] = new Food(random(width), random(height), 10);
   }
 }
 
 
-
-// for (let i = snakeBody.length - 1; i >= 0; i--) { //snakeBody.length - 1 = 4
-//   if (i == 1) {
-//     snakeBody[i].tmpX = snakeBody[i - 1].x;
-//     snakeBody[i].tmpY = snakeBody[i - 1].y;
-//     snakeBody[i].x = snakeBody[i - 1].x;
-//     snakeBody[i].y = snakeBody[i - 1].y;
-//   }
-//   snakeBody[i].tmpX = snakeBody[i - 1].x;
-//   snakeBody[i].tmpY = snakeBody[i - 1].y;
-//   snakeBody[i].x = snakeBody[i - 1].tmpX;
-//   snakeBody[i].y = snakeBody[i - 1].tmpY;
-// }
 
 function keyPressed() {
   for (let i = snakeBody.length - 1; i > 0; i--) { //snakeBody.length - 1 = 4
@@ -140,16 +132,6 @@ function keyPressed() {
       snakeBody[i].y = snakeBody[i - 1].tmpY;
     }
   }
-
-  // for (let i = 0; i < 5; i++) {
-  //   console.log(`TMP X ${i}: ${snakeBody[i].tmpX}!`)
-  //   console.log(`TMP Y ${i}: ${snakeBody[i].tmpY}`)
-  // }
-
-  // for (let i = 0; i < 5; i++) {
-  //   console.log(`X ${i}: ${snakeBody[i].x}`)
-  //   console.log(`Y ${i}: ${snakeBody[i].y}`)
-  // }
 
   if (keyCode === RIGHT_ARROW) {
     snakeBody[0].moveRight();
@@ -171,37 +153,52 @@ function draw() {
   noStroke();
   fill(255);
   circle(ball.x, ball.y, ball.radius);
-  //snake creation
 
+  //Rectangle creation
+  noStroke();
+  fill(255);
+  rect(player.x, player.y, player.width, 10);
+
+  // Ubaci zmiju
   for (let i = 0; i < snakeBody.length; i++) {
     snakeBody[i].display();
   }
 
   // ubaci kocke
-
   for (let i = 0; i < 4; i++) {
     if (squares[i].exists) {
       squares[i].display();
     }
   }
 
-  //ubacihranu
+  //Prikazi hranu
   for (let i = 0; i < snakeFood.length; i++) {
-    snakeFood[i].display();
+    if (snakeFood[i].exists === true) {
+      snakeFood[i].display();
+    }
   }
 
-  // print(squares)
-  // squares[0].create(100, 100);
-  // squares[1].create(200, 100);
 
-  // createSquare(200, 200);
-  // if (squares[0].exists) {
-  //   squares[0].create(100, 100);
-  // }
+  // Jedenje
 
+  // 
+  for (let i = 0; i < snakeFood.length; i++) {
+    if (snakeFood[i].x < snakeBody[0].x + snakeBody[0].size &&
+      snakeFood[i].x + snakeFood[i].size > snakeBody[0].x &&
+      snakeFood[i].y < snakeBody[0].y + snakeBody[0].size &&
+      snakeFood[i].y + snakeFood[i].size > snakeBody[0].y &&
+      snakeFood[i].exists) {
+      snakeFood[i].exists = false;
+      snakeBody[snakeBody.length] = new AddSnake(-10, -10, tmpX, tmpY); // -10 je budza da se pojavi van kanvasa kao startna pozicija
+      break;
+    }
+  }
 
+  // console.log(snakeBody.length)
 
-
+  // snakeBody[i] = new AddSnake(startCoordinateX, startCoordinateY, tmpX, tmpY);
+  // tmpX = tmpX - 10;
+  // startCoordinateX = startCoordinateX - 10;
 
 
   // BOUNCING of canvas
@@ -215,33 +212,13 @@ function draw() {
 
   // Kretanje lopte
   ball.x = ball.x + ball.speedX;
-  ball.y = ball.y + ball.speedY;
+  ball.y = ball.y + ball.speedY * 0.8;
 
   //GRAVITY
-
-  // ball.speedY = ball.speedY + 0.5;
-  // if (ball.speedY < 0) {
-  //   ball.speedY = ball.speedY + 0.5
-  // } else if (ball.speedY > 0) {
-  //   ball.speedY = ball.speedY - 0.5
-  // }
-  // if (ball.speedY > 0.3 && ball.speedY < 0.4) { // BUDZA
-  //   ball.speedY = 0.5;
-  // }
-  // print(`X speed: ${ball.speedX}`)
-  // print(`Y speed: ${ball.speedY}`)
-
-  // if (ball.speedY < 4) {
-  //   ball.speedY = ball.speedY + 4;
-  // }
-  // ballSpeedY++; JEBEM TI GRAVITACIJU
-  // print(ballSpeedY)
+  ball.speedY = ball.speedY + 0.2;
+  // console.log(ball.speedY)
 
 
-  //Rectangle creation
-  noStroke();
-  fill(255);
-  square(player.x, player.y, player.width, player.height);
 
   // Rectangle position and capping width to stay on canvas
   if (mouseX + player.width / 2 > width) {
@@ -255,14 +232,7 @@ function draw() {
   // player.x = 200;
 
   // ODBIJANJE OD RECTA
-
-  // if (ball.y + ball.radius > height - player.height - 10) {
-  //   if (ball.x > player.x && ball.x < player.x + player.width) {
-  //     ball.speedY = -ball.speedY;
-  //   }
-  // }
-
-  if (ball.y + ball.radius > height - player.height && ball.x > player.x && ball.x < player.x + player.width) {
+  if (ball.y + ball.radius >= height - player.height && ball.x >= player.x && ball.x <= player.x + player.width) {
     ball.speedY = -ball.speedY;
   }
 
@@ -277,5 +247,4 @@ function draw() {
       }
     }
   }
-
 }
