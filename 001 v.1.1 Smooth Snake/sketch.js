@@ -3,7 +3,11 @@ const ball = {
   y: 50,
   radius: 10,
   speedX: 3,
-  speedY: 3
+  speedY: 3,
+  spawn: function (newX, newY) {
+    this.x = newX;
+    this.y = newY;
+  }
 }
 
 const snakeBody = [];
@@ -21,14 +25,7 @@ function AddSnake(x, y, tmpX, tmpY) { // x = 40 y = 50
   }
 }
 
-const snakeFood = []
-
-// To fit in a grid nicely
-// function foodGridRandom(number) {
-//   return random(number / 10) * 10;
-// }
-
-// console.log(foodGridRandom(360));
+let snakeFood = []
 
 function Food(x, y, size) {
   this.x = x;
@@ -50,6 +47,7 @@ snakeBody[0] = {
   size: 10,
   body: 3,
   speed: 10,
+  alive: true,
   display: function () {
     noStroke();
     fill(255);
@@ -57,40 +55,16 @@ snakeBody[0] = {
   },
   tmpX: this.x - 10,
   tmpY: this.y - 10,
-  move: function () {
-    // switch (this.dir) {
-    //   case 'r':
-    //     this.x = this.x + this.speed;
-    //     break;
-    //   case y:
-    //     // code block
-    //     break;
-    //   default:
-    //   // code block
-    // }
-    this.x = this.x + this.speed;
-  },
-  moveRight: function () {
-    this.x = this.x + this.speed;
-    // setInterval(function () { this.x = this.x + this.speed; }, 3000);
-  },
-  moveLeft: function () {
-    this.x = this.x - this.speed;
-  },
-  moveUp: function () {
-    this.y = this.y - this.speed;
-  },
-  moveDown: function () {
-    this.y = this.y + this.speed;
-  },
 }
 
 
-const player = {
+const pong = {
   x: 0,
   y: 800 - 20,
   width: 100,
-  height: 10
+  height: 10,
+  lives: 3,
+  alive: true
 }
 
 let squares = [];
@@ -106,9 +80,11 @@ function Square(x, y) {
     square(x, y, 20);
   }
 }
+// SNAKEFOOD BOOLEAN
+// let snakeFoodBool = true;
 
 //ADD SNAKE
-let snakeSize = 3;
+let snakeSize = 10;
 let startCoordinateX = 40;
 let startCoordinateY = 50;
 let tmpX = 40;
@@ -119,136 +95,134 @@ for (let i = 1; i <= snakeSize; i++) {
   startCoordinateX = startCoordinateX - 10;
 }
 
-let counter = 0;
+// let counter = 0;
 
-function setup() {
-  createCanvas(500, 800);
-  background(0);
-  noStroke();
-  fill(255);
-  circle(200, 200, 255);
-
-  // PROBA TEST INTERVAL
-  timer = createP('timer')
-  // setInterval(timeIt, 500);
-
-  //Kretanje zmije postavljanje intervala
-  setInterval(snakeMove, 300);
-  //UBACUJE square[i] u array squarova
-  for (let i = 0; i < 4; i++) {
-    squares[i] = new Square((i + 1) * 100, 100);
-  }
-
-  //ADD SNAKEFOOD
-  for (let i = 0; i < 15; i++) {
+//Add snakefood and repeat when no left
+function addSnakeFood() {
+  for (let i = 0; i < 5; i++) {
     snakeFood[i] = new Food(round(random(width / 10)) * 10, round(random(height / 10)) * 10, 10);
-    console.log(snakeFood[i].x, snakeFood[i].y)
-  }
-  v1 = createVector(width / 2, height / 2)
-}
-
-function snakeMove() {
-  for (let i = snakeBody.length - 1; i > 0; i--) { //snakeBody.length - 1 = 4
-    if (i === 1) {
-      snakeBody[i].tmpX = snakeBody[i - 1].x;
-      snakeBody[i].tmpY = snakeBody[i - 1].y;
-      snakeBody[i].x = snakeBody[i - 1].x;
-      snakeBody[i].y = snakeBody[i - 1].y;
-    } else {
-      snakeBody[i].tmpX = snakeBody[i - 1].x;
-      snakeBody[i].tmpY = snakeBody[i - 1].y;
-      snakeBody[i].x = snakeBody[i - 1].tmpX;
-      snakeBody[i].y = snakeBody[i - 1].tmpY;
-    }
-  }
-  switch (snakeBody[0].dir) {
-    case 'r':
-      snakeBody[0].x = snakeBody[0].x + 10;
-      break;
-    case 'l':
-      snakeBody[0].x = snakeBody[0].x - 10;
-      break;
-    case 'u':
-      snakeBody[0].y = snakeBody[0].y - 10;
-      break;
-    case 'd':
-      snakeBody[0].y = snakeBody[0].y + 10;
-      break;
-    default:
-  }
-}
-
-function timeIt() {
-  timer.html(counter);
-  counter++;
-}
-
-
-function keyPressed() {
-  for (let i = snakeBody.length - 1; i > 0; i--) { //snakeBody.length - 1 = 4
-    if (i === 1) {
-      snakeBody[i].tmpX = snakeBody[i - 1].x;
-      snakeBody[i].tmpY = snakeBody[i - 1].y;
-      snakeBody[i].x = snakeBody[i - 1].x;
-      snakeBody[i].y = snakeBody[i - 1].y;
-    } else {
-      snakeBody[i].tmpX = snakeBody[i - 1].x;
-      snakeBody[i].tmpY = snakeBody[i - 1].y;
-      snakeBody[i].x = snakeBody[i - 1].tmpX;
-      snakeBody[i].y = snakeBody[i - 1].tmpY;
-    }
-  }
-
-  if (keyCode === RIGHT_ARROW) {
-    // snakeBody[0].moveRight();
-    snakeBody[0].dir = "r";
-  }
-  if (keyCode === LEFT_ARROW) {
-    // snakeBody[0].moveLeft();
-    snakeBody[0].dir = "l";
-  }
-  if (keyCode === UP_ARROW) {
-    // snakeBody[0].moveUp();
-    snakeBody[0].dir = "u";
-  }
-  if (keyCode === DOWN_ARROW) {
-    // snakeBody[0].moveDown();
-    snakeBody[0].dir = "d";
+    // console.log(snakeFood[i].x, snakeFood[i].y)
   }
 }
 
 let x = 0;
 
-function draw() {
-  //BALL creation
+function refreshSnakeFood() {
+  snakeFood = [];
+
+  stroke(255);
+  line(x, 0, x, height);
+  x = x + 3;
+}
+
+function endGame() {
+
+}
+
+function setup() {
+  let canvas = createCanvas(500, 800);
+  canvas.parent('sketch-container');
+
   background(0);
+  noStroke();
+  fill(255);
+  circle(200, 200, 255);
+
+  setInterval(refreshSnakeFood(), 10000);
+
+  //UBACUJE square[i] u array squarova
+  for (let i = 0; i < 12; i++) {
+    if (i < 4) {
+      squares[i] = new Square((i + 1) * 100, 100);
+    } else if (i >= 4 && i < 8) {
+      squares[i] = new Square((i - 3) * 100, 200);
+    } else {
+      squares[i] = new Square((i - 7) * 100, 300);
+    }
+  }
+
+  //ADD SNAKEFOOD
+  addSnakeFood();
+}
+
+
+function keyPressed() {
+  if (snakeBody[0].alive === true) {
+    if (keyCode === RIGHT_ARROW) {
+      // snakeBody[0].moveRight();
+      if (snakeBody[0].dir !== "l") {
+        snakeBody[0].dir = "r";
+      }
+    }
+    if (keyCode === LEFT_ARROW) {
+      // snakeBody[0].moveLeft();
+      if (snakeBody[0].dir !== "r") {
+        snakeBody[0].dir = "l";
+      }
+    }
+    if (keyCode === UP_ARROW) {
+      // snakeBody[0].moveUp();
+      if (snakeBody[0].dir !== "d") {
+        snakeBody[0].dir = "u";
+      }
+    }
+    if (keyCode === DOWN_ARROW) {
+      // snakeBody[0].moveDown();
+      if (snakeBody[0].dir !== "u") {
+        snakeBody[0].dir = "d";
+      }
+    }
+  }
+}
+
+//If food exists
+let snakeFoodBool = true;
+
+function draw() {
+  background(0);
+
+  //BALL creation
   noStroke();
   fill(255);
   circle(ball.x, ball.y, ball.radius);
 
-  //PROBA TEST INTERVAL
-  stroke(255);
-  line(x, 0, x, height);
-
-  x = x + 3;
-  if (x > width) {
-    x = 0;
+  // Kretanje lopte
+  if (pong.alive === true && snakeBody[0].alive === true) {
+    ball.x = ball.x + ball.speedX;
+    ball.y = ball.y + ball.speedY;
   }
 
-  //Rectangle creation
-  noStroke();
-  fill(255);
-  rect(player.x, player.y, player.width, 10);
+  //Pong creation
+  if (pong.alive === true) {
+    noStroke();
+    fill(255);
+    rect(pong.x, pong.y, pong.width, 10);
+  } else {
+    if (frameCount % 5 === 0) {
+      noStroke();
+      fill(255);
+      rect(pong.x, pong.y, pong.width, 10);
+    }
+  }
+
+  // refreshSnakeFood();
 
   // Prikazi zmiju
-  //SNAKE MOVEMENT
-  for (let i = 0; i < snakeBody.length; i++) {
-    snakeBody[i].display();
+  if (snakeBody[0].alive === true) {
+    for (let i = 0; i < snakeBody.length; i++) {
+      snakeBody[i].display();
+    }
+  } else {
+    if (frameCount % 5 === 0) {
+      for (let i = 0; i < snakeBody.length; i++) {
+        snakeBody[i].display();
+      }
+    }
   }
   // snakeBody[0].x = snakeBody[0].x + 2;
 
   // ubaci kocke
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < squares.length; i++) {
     if (squares[i].exists) {
       squares[i].display();
     }
@@ -261,43 +235,50 @@ function draw() {
     }
   }
 
-  //TAIL FOLLOWING
-  // for (let i = snakeBody.length - 1; i > 0; i--) { //snakeBody.length - 1 = 4
-  //   if (i === 1) {
-  //     snakeBody[i].tmpX = snakeBody[i - 1].x;
-  //     snakeBody[i].tmpY = snakeBody[i - 1].y;
-  //     snakeBody[i].x = snakeBody[i - 1].x;
-  //     snakeBody[i].y = snakeBody[i - 1].y;
-  //   } else {
-  //     snakeBody[i].tmpX = snakeBody[i - 1].x;
-  //     snakeBody[i].tmpY = snakeBody[i - 1].y;
-  //     snakeBody[i].x = snakeBody[i - 1].tmpX;
-  //     snakeBody[i].y = snakeBody[i - 1].tmpY;
-  //   }
-  // }
+  //TAIL FOLLOWING  Tail refresh malo secka i nije lepo
 
-  //SNAKE MOVING (CHANGING DIRECTION)
-  // switch (snakeBody[0].dir) {
-  //   case 'r':
-  //     snakeBody[0].x = snakeBody[0].x + 1;
-  //     break;
-  //   case 'l':
-  //     snakeBody[0].x = snakeBody[0].x - 1;
-  //     break;
-  //   case 'u':
-  //     snakeBody[0].y = snakeBody[0].y - 1;
-  //     break;
-  //   case 'd':
-  //     snakeBody[0].y = snakeBody[0].y + 1;
-  //     break;
-  //   default:
-  // }
+  for (let i = snakeBody.length - 1; i > 0; i--) { //snakeBody.length - 1 = 4
+    if (snakeBody[0].alive === true) {
+      if (i === 1) {
+        snakeBody[i].tmpX = snakeBody[i - 1].x;
+        snakeBody[i].tmpY = snakeBody[i - 1].y;
+        snakeBody[i].x = snakeBody[i - 1].x;
+        snakeBody[i].y = snakeBody[i - 1].y;
+      } else {
+        snakeBody[i].tmpX = snakeBody[i - 1].x;
+        snakeBody[i].tmpY = snakeBody[i - 1].y;
+        snakeBody[i].x = snakeBody[i - 1].tmpX;
+        snakeBody[i].y = snakeBody[i - 1].tmpY;
+      }
+    }
+  }
 
+  // snakeMove();
+
+  if (pong.alive === true && snakeBody[0].alive === true) {
+    // SNAKE MOVING(CHANGING DIRECTION)
+    switch (snakeBody[0].dir) {
+      case 'r':
+        snakeBody[0].x = snakeBody[0].x + 3;
+        // if (snakeBody[0].x < 0) {
+        //   snakeBody[0].x = width;
+        // }
+        break;
+      case 'l':
+        snakeBody[0].x = snakeBody[0].x - 3;
+        break;
+      case 'u':
+        snakeBody[0].y = snakeBody[0].y - 3;
+        break;
+      case 'd':
+        snakeBody[0].y = snakeBody[0].y + 3;
+        break;
+      default:
+    }
+  }
 
 
   // Jedenje
-
-  // 
   for (let i = 0; i < snakeFood.length; i++) {
     if (snakeFood[i].x < snakeBody[0].x + snakeBody[0].size &&
       snakeFood[i].x + snakeFood[i].size > snakeBody[0].x &&
@@ -310,11 +291,18 @@ function draw() {
     }
   }
 
-  // console.log(snakeBody.length)
-
-  // snakeBody[i] = new AddSnake(startCoordinateX, startCoordinateY, tmpX, tmpY);
-  // tmpX = tmpX - 10;
-  // startCoordinateX = startCoordinateX - 10;
+  //Addsnakefood if no left
+  for (let i = 0; i < snakeFood.length; i++) {
+    if (snakeFood[i].exists === true) {
+      break;
+    } else {
+      snakeFoodBool = false;
+    }
+  }
+  if (snakeFoodBool === false) {
+    addSnakeFood();
+    snakeFoodBool = true;
+  }
 
 
   // BOUNCING of canvas
@@ -322,43 +310,42 @@ function draw() {
     ball.speedX = -ball.speedX;
   }
 
-  if (ball.y + ball.radius > height || ball.y - ball.radius < 0) {
+  if (ball.y - ball.radius < 0) {
     ball.speedY = -ball.speedY;
   }
 
-  // Kretanje lopte
-  ball.x = ball.x + ball.speedX;
-  ball.y = ball.y + ball.speedY * 0.8;
+  if (ball.y + ball.radius > height) {
+    ball.spawn(200, 300);
+    if (pong.lives > 0) {
+      pong.lives = pong.lives - 1;
+      console.log(pong.lives)
+    } else if (pong.lives === 0) {
+      pong.alive = false;
+    }
+  }
+
 
   //GRAVITY
-  ball.speedY = ball.speedY + 0.2;
+  // ball.speedY = ball.speedY + 0.2;
   // console.log(ball.speedY)
 
 
 
   // Rectangle position and capping width to stay on canvas
-  if (mouseX + player.width / 2 > width) {
-    player.x = width - player.width;
-  } else if (mouseX - player.width / 2 < 0) {
-    player.x = 0;
+  if (mouseX + pong.width / 2 > width) {
+    pong.x = width - pong.width;
+  } else if (mouseX - pong.width / 2 < 0) {
+    pong.x = 0;
   } else {
-    player.x = mouseX - player.width / 2;
+    pong.x = mouseX - pong.width / 2;
   }
 
-  // player.x = 200;
+  // pong.x = 200;
 
   // ODBIJANJE OD RECTA
-  if (ball.y + ball.radius >= height - player.height && ball.x >= player.x && ball.x <= player.x + player.width) {
+  if (ball.y + ball.radius >= height - pong.height && ball.x >= pong.x && ball.x <= pong.x + pong.width) {
     ball.speedY = -ball.speedY;
   }
-
-  // stroke(255);
-  // line(100, 100, 400, 256);
-
-  // circle(mouseX, mouseY, 100);
-  // line(100, 100, mouseX, mouseY);
-  // line(v1.x, v1.y, mouseX, mouseY);
-
 
 
   //ODBIJANJE OD KOCKICA
@@ -371,4 +358,39 @@ function draw() {
       }
     }
   }
+
+  // Udarac zmije u kocku
+  for (let i = 0; i < squares.length; i++) {
+    if (squares[i].exists) {
+      if (squares[i].x < snakeBody[0].x + snakeBody[0].size &&
+        squares[i].x + squares[i].size > snakeBody[0].x &&
+        squares[i].y < snakeBody[0].y + snakeBody[0].size &&
+        squares[i].y + squares[i].size > snakeBody[0].y) {
+        snakeBody[0].dir = 'none';
+        snakeBody[0].alive = false;
+        snakeBody[0].speed = 0;
+      }
+    }
+  }
+
+  // Udarac lopte u zmiju
+  for (let i = 0; i < snakeBody.length; i++) {
+    if (ball.y > snakeBody[i].y && ball.y < snakeBody[i].y + snakeBody[i].size && ball.x > snakeBody[i].x && ball.x < snakeBody[i].x + snakeBody[i].size) {
+      snakeBody[0].dir = 'none';
+      snakeBody[0].alive = false;
+      snakeBody[0].speed = 0;
+      console.log('hit')
+    }
+  }
+
+  if (snakeBody[0].alive === false) {
+    winner.textContent = 'PONG WINS'
+    winner.style.display = 'block'
+  }
+
+  if (pong.alive === false) {
+    winner.textContent = 'SNAKE WINS'
+    winner.style.display = 'block'
+  }
+
 }
